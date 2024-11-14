@@ -1,22 +1,26 @@
 import { SortOrder } from './sort-order-enum';
 import { IsOptional, IsInt, Min, IsEnum, IsString } from 'class-validator';
 
-export class GenericFilter {
+export class FilterDto {
+  @IsOptional()
   @IsInt()
   @Min(1)
-  @IsOptional()
   page: number = 1;
 
+  @IsOptional()
   @IsInt()
   @Min(1)
-  @IsOptional()
   pageSize: number = 10;
 
-  @IsString()
   @IsOptional()
+  @IsString()
   public orderBy?: string;
 
-  @IsEnum(SortOrder)
   @IsOptional()
+  @IsEnum(SortOrder)
   public sortOrder?: SortOrder = SortOrder.DESC;
+
+  @IsOptional()
+  @IsString()
+  title?: string;
 }

@@ -1,9 +1,9 @@
 import { Repository, FindOptionsWhere } from 'typeorm';
-import { GenericFilter } from './filter';
+import { FilterDto } from './filter.dto';
 import { SortOrder } from './sort-order-enum';
 
 export class PageService {
-  protected createOrderQuery(filter: GenericFilter) {
+  protected createOrderQuery(filter: FilterDto) {
     const order: any = {};
 
     if (filter.orderBy) {
@@ -11,18 +11,18 @@ export class PageService {
       return order;
     }
 
-    order.createdAt = SortOrder.DESC;
+    order.id = SortOrder.DESC;
     return order;
   }
 
   protected paginate<T>(
     repository: Repository<T>,
-    filter: GenericFilter,
+    filter: FilterDto,
     where: FindOptionsWhere<T>,
   ) {
     return repository.findAndCount({
       order: this.createOrderQuery(filter),
-      skip: (filter.page - 1) * (filter.pageSize + 1),
+      skip: (filter.page - 1) * filter.pageSize,
       take: filter.pageSize,
       where: where,
     });
