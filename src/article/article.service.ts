@@ -3,12 +3,15 @@ import { CreateArticleDto } from './dto/create-article.dto';
 import { Article } from './entities/article.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { PageService } from 'src/common/page.service';
 
 @Injectable()
-export class ArticleService {
+export class ArticleService extends PageService {
   constructor(
     @InjectRepository(Article) private articleRepository: Repository<Article>,
-  ) {}
+  ) {
+    super();
+  }
 
   async create(createArticleDto: CreateArticleDto) {
     const { title, body } = createArticleDto;
