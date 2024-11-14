@@ -46,4 +46,10 @@ export class ArticleController {
   getAll() {
     return this.articleService.getAll();
   }
+
+  @Public()
+  @Post('/fillArticles')
+  fillArticles() {
+    return this.articleService.fillArticles();
+  }
 }

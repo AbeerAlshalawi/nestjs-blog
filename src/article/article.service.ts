@@ -5,11 +5,13 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UpdateArticleDto } from './dto/update-article.dto';
 import { User } from 'src/user/entities/user.entity';
+import { faker } from '@faker-js/faker';
 
 @Injectable()
 export class ArticleService {
   constructor(
     @InjectRepository(Article) private articleRepository: Repository<Article>,
+    @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
 
   async create(createArticleDto: CreateArticleDto, userId: number) {
@@ -74,5 +76,17 @@ export class ArticleService {
   async getAll() {
     const articles = await this.articleRepository.find();
     return articles;
+  }
+
+  async fillArticles() {
+    const articlesRepo = this.articleRepository;
+    const users = await this.userRepository.find();
+
+    const article = Array.from({ length: 1000 }, () => ({
+      title: faker.lorem.sentence(),
+      body: faker.lorem.paragraphs(3),
+      user: users[Math.floor(Math.random() * users.length)],
+    }));
+    await articlesRepo.save(article);
   }
 }
