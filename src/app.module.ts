@@ -10,7 +10,6 @@ import { JwtGuard } from './auth/guards/jwt.guard';
 import { JwtStrategy } from './auth/strategy/jwt.startegy';
 import { ConfigModule } from '@nestjs/config';
 import { CommentsModule } from './comments/comments.module';
-import { LikesModule } from './likes/likes.module';
 
 const entitiesPath = __dirname + '/**/*.entity{.ts,.js}';
 
@@ -31,7 +30,6 @@ const entitiesPath = __dirname + '/**/*.entity{.ts,.js}';
     UserModule,
     AuthModule,
     CommentsModule,
-    LikesModule,
   ],
   controllers: [AppController],
   providers: [
