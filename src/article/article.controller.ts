@@ -8,12 +8,14 @@ import {
   Delete,
   Param,
   Patch,
+  Query,
 } from '@nestjs/common';
 import { ArticleService } from './article.service';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { Public } from 'src/auth/decorators/public.decorator';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { UpdateArticleDto } from './dto/update-article.dto';
+import { FilterDto } from 'src/common/filter.dto';
 
 @Controller({ path: 'articles', version: '1.0' })
 export class ArticleController {
@@ -43,8 +45,8 @@ export class ArticleController {
 
   @Public()
   @Get('')
-  getAll() {
-    return this.articleService.getAll();
+  getAll(@Query() filter: FilterDto) {
+    return this.articleService.getAll(filter);
   }
 
   @Public()

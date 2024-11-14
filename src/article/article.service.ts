@@ -1,18 +1,22 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { Article } from './entities/article.entity';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UpdateArticleDto } from './dto/update-article.dto';
 import { User } from 'src/user/entities/user.entity';
 import { faker } from '@faker-js/faker';
+import { PageService } from 'src/common/page.service';
+import { FilterDto } from 'src/common/filter.dto';
 
 @Injectable()
-export class ArticleService {
+export class ArticleService extends PageService {
   constructor(
     @InjectRepository(Article) private articleRepository: Repository<Article>,
     @InjectRepository(User) private userRepository: Repository<User>,
-  ) {}
+  ) {
+    super();
+  }
 
   async create(createArticleDto: CreateArticleDto, userId: number) {
     const { title, body } = createArticleDto;
@@ -73,9 +77,25 @@ export class ArticleService {
     await this.articleRepository.remove(article);
   }
 
-  async getAll() {
-    const articles = await this.articleRepository.find();
-    return articles;
+  async getAll(filter: FilterDto) {
+    const where = {};
+
+    if (filter.title) {
+      where['title'] = Like(`%${filter.title}%`);
+    }
+
+    const [articles, count] = await this.paginate(
+      this.articleRepository,
+      filter,
+      where,
+    );
+
+    return {
+      data: articles,
+      count: count,
+      currentPage: filter.page,
+      pageSize: filter.pageSize,
+    };
   }
 
   async fillArticles() {
