@@ -1,9 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { CreateArticleDto } from './dto/create-article.dto';
+import { CreateArticleDTO } from './dto/create-article.dto';
 import { Article } from './entities/article.entity';
 import { Like, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UpdateArticleDto } from './dto/update-article.dto';
+import { UpdateArticleDTO } from './dto/update-article.dto';
 import { User } from 'src/user/entities/user.entity';
 import { faker } from '@faker-js/faker';
 import { PageService } from 'src/common/page.service';
@@ -18,7 +18,7 @@ export class ArticleService extends PageService {
     super();
   }
 
-  async create(createArticleDto: CreateArticleDto, userId: number) {
+  async create(createArticleDto: CreateArticleDTO, userId: number) {
     const { title, body } = createArticleDto;
 
     if (!title || !body) {
@@ -35,7 +35,7 @@ export class ArticleService extends PageService {
     await this.articleRepository.save(article);
   }
 
-  async update(id: number, updateArticleDto: UpdateArticleDto, userId: number) {
+  async update(id: number, updateArticleDto: UpdateArticleDTO, userId: number) {
     const article = await this.articleRepository.findOne({
       where: { id },
       relations: ['user'],

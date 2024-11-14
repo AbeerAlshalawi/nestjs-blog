@@ -1,6 +1,10 @@
-import { ArticleDto } from 'src/article/dto/article.dto';
+import { IsNotEmpty, IsString } from 'class-validator';
+import { ArticleDTO } from 'src/article/dto/article.dto';
 
-export class UserDto {
+export class UserDTO {
+  @IsString()
+  @IsNotEmpty()
   username: string;
-  articles: ArticleDto[];
+
+  articles: ArticleDTO[];
 }

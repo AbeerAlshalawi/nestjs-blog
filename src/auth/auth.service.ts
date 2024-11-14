@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { User } from 'src/user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
-import { RegisterRequestDto } from './dto/register-request.dto';
+import { RegisterRequestDTO } from './dto/register-request.dto';
 import { AccessToken } from './types/AccessToken';
 
 @Injectable()
@@ -30,7 +30,7 @@ export class AuthService {
     return { access_token: this.jwtService.sign(payload) };
   }
 
-  async register(user: RegisterRequestDto): Promise<AccessToken> {
+  async register(user: RegisterRequestDTO): Promise<AccessToken> {
     const existingUser = await this.userService.findOneByUsername(
       user.username,
     );
