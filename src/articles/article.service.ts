@@ -4,7 +4,7 @@ import { Article } from './entities/article.entity';
 import { Like, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UpdateArticleDTO } from './dto/update-article.dto';
-import { User } from 'src/user/entities/user.entity';
+import { User } from 'src/users/entities/user.entity';
 import { faker } from '@faker-js/faker';
 import { PageService } from 'src/common/page.service';
 import { FilterDto } from 'src/common/filter.dto';

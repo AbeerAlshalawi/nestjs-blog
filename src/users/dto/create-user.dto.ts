@@ -1,5 +1,5 @@
 import { IsNotEmpty, IsString } from 'class-validator';
-import { Article } from 'src/article/entities/article.entity';
+import { Article } from 'src/articles/entities/article.entity';
 
 export class CreateUserDTO {
   @IsString()
