@@ -44,6 +44,8 @@ export class AuthService {
       password: hashedPassword,
       articles: [],
       comments: [],
+      followers: [],
+      followings: [],
     };
     await this.userService.create(newUser);
     return this.login(newUser);
