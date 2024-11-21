@@ -22,6 +22,12 @@ export class UserController {
     return this.userService.create(createUserDto);
   }
 
+  @UseGuards(JwtGuard)
+  @Get('myProfile')
+  async getUserProfile(@Request() req) {
+    return await this.userService.findProfileById(req.user.id);
+  }
+
   @Get(':username')
   findOneByUsername(@Param('username') username: string) {
     return this.userService.findOneByUsername(username);

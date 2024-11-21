@@ -32,6 +32,23 @@ export class UserService {
     return user;
   }
 
+  async findProfileById(id: number) {
+    const user = await this.userRepository.findOneBy({ id });
+
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+
+    const followers = await this.getFollowers(id);
+    const followings = await this.getFollowings(id);
+
+    return {
+      user,
+      followers: followers.map((follow) => follow.follower),
+      followings: followings.map((follow) => follow.following),
+    };
+  }
+
   getFollowers(userId: number) {
     return this.followRepository.find({
       where: { following: { id: userId } },
