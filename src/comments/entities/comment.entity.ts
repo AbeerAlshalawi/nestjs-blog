@@ -1,14 +1,27 @@
 import { Article } from 'src/articles/entities/article.entity';
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { User } from 'src/users/entities/user.entity';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  CreateDateColumn,
+} from 'typeorm';
 
-@Entity('Comments')
+@Entity('comments')
 export class Comment {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ type: 'text' })
   content: string;
 
   @ManyToOne(() => Article, (article) => article.comments)
   article: Article;
+
+  @ManyToOne(() => User, (user) => user.comments)
+  user: User;
+
+  @CreateDateColumn({ type: 'timestamp' })
+  createdAt: Date;
 }
