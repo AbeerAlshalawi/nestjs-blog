@@ -99,14 +99,31 @@ export class ArticleService extends PageService {
   }
 
   async fillArticles() {
-    const articlesRepo = this.articleRepository;
-    const users = await this.userRepository.find();
+    const articlesRepo: Repository<Article> = this.articleRepository;
 
-    const article = Array.from({ length: 1000 }, () => ({
-      title: faker.lorem.sentence(),
-      body: faker.lorem.paragraphs(3),
-      user: users[Math.floor(Math.random() * users.length)],
-    }));
-    await articlesRepo.save(article);
+    const chunkSize = 10_000;
+    const totalArticles = 1_000_000;
+    const articles = [];
+
+    for (let i = 0; i < totalArticles; i++) {
+      const randomTitle = faker.lorem.sentence(1);
+      const randomBody = faker.lorem.text();
+
+      articles.push({
+        title: randomTitle,
+        body: randomBody,
+      });
+
+      if (articles.length === chunkSize) {
+        console.log('Inserting chunk Number:', Math.floor(i / chunkSize) + 1);
+        console.log('Percentage done:', ((i + 1) / totalArticles) * 100 + '%');
+        await articlesRepo.insert(articles);
+        articles.length = 0;
+      }
+    }
+
+    if (articles.length > 0) {
+      await articlesRepo.insert(articles);
+    }
   }
 }

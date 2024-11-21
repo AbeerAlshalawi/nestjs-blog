@@ -6,9 +6,10 @@ import {
   Column,
   ManyToOne,
   OneToMany,
+  CreateDateColumn,
 } from 'typeorm';
 
-@Entity('Articles')
+@Entity('articles')
 export class Article {
   @PrimaryGeneratedColumn()
   id: number;
@@ -16,7 +17,7 @@ export class Article {
   @Column()
   title: string;
 
-  @Column()
+  @Column({ type: 'text' })
   body: string;
 
   @ManyToOne(() => User, (user) => user.articles)
@@ -24,4 +25,7 @@ export class Article {
 
   @OneToMany(() => Comment, (comment) => comment.article)
   comments: Comment[];
+
+  @CreateDateColumn({ type: 'timestamp' })
+  createdAt: Date;
 }

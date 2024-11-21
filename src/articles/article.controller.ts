@@ -21,6 +21,12 @@ import { FilterDto } from 'src/common/filter.dto';
 export class ArticleController {
   constructor(private readonly articleService: ArticleService) {}
 
+  @Public()
+  @Post('fillArticles')
+  async fillArtciles() {
+    await this.articleService.fillArticles();
+  }
+
   @UseGuards(JwtGuard)
   @Post('')
   create(@Body() createArticleDto: CreateArticleDTO, @Request() req) {
@@ -47,11 +53,5 @@ export class ArticleController {
   @Get('')
   getAll(@Query() filter: FilterDto) {
     return this.articleService.getAll(filter);
-  }
-
-  @Public()
-  @Post('/fillArticles')
-  fillArticles() {
-    return this.articleService.fillArticles();
   }
 }
