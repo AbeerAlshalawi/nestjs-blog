@@ -23,4 +23,8 @@ export class FilterDto {
   @IsOptional()
   @IsString()
   title?: string;
+
+  @IsOptional()
+  @IsString()
+  content?: string;
 }

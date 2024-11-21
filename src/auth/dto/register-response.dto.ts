@@ -1,3 +1,3 @@
 import { AccessToken } from '../types/AccessToken';
 
-export type RegisterResponseDto = AccessToken;
+export type RegisterResponseDTO = AccessToken;

@@ -11,10 +11,10 @@ import {
   Query,
 } from '@nestjs/common';
 import { ArticleService } from './article.service';
-import { CreateArticleDto } from './dto/create-article.dto';
+import { CreateArticleDTO } from './dto/create-article.dto';
 import { Public } from 'src/auth/decorators/public.decorator';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
-import { UpdateArticleDto } from './dto/update-article.dto';
+import { UpdateArticleDTO } from './dto/update-article.dto';
 import { FilterDto } from 'src/common/filter.dto';
 
 @Controller({ path: 'articles', version: '1.0' })
@@ -23,7 +23,7 @@ export class ArticleController {
 
   @UseGuards(JwtGuard)
   @Post('')
-  create(@Body() createArticleDto: CreateArticleDto, @Request() req) {
+  create(@Body() createArticleDto: CreateArticleDTO, @Request() req) {
     return this.articleService.create(createArticleDto, req.user.id);
   }
 
@@ -31,7 +31,7 @@ export class ArticleController {
   @Patch(':id')
   update(
     @Param('id') id: number,
-    @Body() updateArticleDto: UpdateArticleDto,
+    @Body() updateArticleDto: UpdateArticleDTO,
     @Request() req,
   ) {
     return this.articleService.update(id, updateArticleDto, req.user.id);

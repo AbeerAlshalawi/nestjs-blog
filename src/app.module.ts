@@ -2,13 +2,14 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ArticleModule } from './article/article.module';
-import { UserModule } from './user/user.module';
+import { ArticleModule } from './articles/article.module';
+import { UserModule } from './users/user.module';
 import { AuthModule } from './auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtGuard } from './auth/guards/jwt.guard';
 import { JwtStrategy } from './auth/strategy/jwt.startegy';
 import { ConfigModule } from '@nestjs/config';
+import { CommentsModule } from './comments/comments.module';
 
 const entitiesPath = __dirname + '/**/*.entity{.ts,.js}';
 
@@ -28,6 +29,7 @@ const entitiesPath = __dirname + '/**/*.entity{.ts,.js}';
     ArticleModule,
     UserModule,
     AuthModule,
+    CommentsModule,
   ],
   controllers: [AppController],
   providers: [
