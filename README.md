@@ -11,7 +11,7 @@ And this command to apply it on the articles table to index articles by title
 CREATE INDEX idx_articles_on_title ON "articles"(title)
 ```
 
-After applying indexing there was a big improvement in the executing time. This is an example for querying by username from the users table:
+After applying indexing there was a big improvement in the execution time. This is an example for querying by username from the users table:
 #### Before indexing:
 <img src="/Without Indexing.png"/>
 
