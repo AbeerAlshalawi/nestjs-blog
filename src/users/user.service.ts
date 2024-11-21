@@ -4,6 +4,7 @@ import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Follow } from './entities/follow.entity';
+import { faker } from '@faker-js/faker';
 
 @Injectable()
 export class UserService {
@@ -25,6 +26,35 @@ export class UserService {
 
     const user = this.userRepository.create(createUserDto);
     await this.userRepository.save(user);
+  }
+
+  async fillUsers() {
+    const usersRepo: Repository<User> = this.userRepository;
+
+    const chunkSize = 10_000;
+    const totalUsers = 1_000_000;
+    const users = [];
+
+    for (let i = 0; i < totalUsers; i++) {
+      const randomUsername = faker.internet.username;
+      const randomPassword = faker.internet.password();
+
+      users.push({
+        username: randomUsername,
+        password: randomPassword,
+      });
+
+      if (users.length === chunkSize) {
+        console.log('Inserting chunk Number:', Math.floor(i / chunkSize) + 1);
+        console.log('Percentage done:', ((i + 1) / totalUsers) * 100 + '%');
+        await usersRepo.insert(users);
+        users.length = 0;
+      }
+    }
+
+    if (users.length > 0) {
+      await usersRepo.insert(users);
+    }
   }
 
   async findOneByUsername(username: string): Promise<User | null> {
