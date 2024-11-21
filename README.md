@@ -2,11 +2,11 @@
 <img src="/DB Diagram.png"/>
 
 ## Indexing
-I used the following query to apply indexing for the users table by username
+I used the following statement to apply indexing for the users table by username
 ```
 CREATE INDEX idx_users_on_username ON "users"(username)
 ```
-And this command to apply it on the articles table to index articles by title
+And this statement to index articles by title
 ```
 CREATE INDEX idx_articles_on_title ON "articles"(title)
 ```
