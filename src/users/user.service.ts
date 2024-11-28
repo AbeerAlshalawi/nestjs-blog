@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDTO } from './dto/create-user.dto';
-import { User } from './entities/user.entity';
+import { Gender, User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Follow } from './entities/follow.entity';
@@ -40,12 +40,14 @@ export class UserService extends PageService {
     const users = [];
 
     for (let i = 0; i < totalUsers; i++) {
-      const randomUsername = faker.internet.username;
+      const randomUsername = faker.internet.username();
       const randomPassword = faker.internet.password();
+      const randomGender = faker.helpers.arrayElement(Object.values(Gender));
 
       users.push({
         username: randomUsername,
         password: randomPassword,
+        gender: randomGender,
       });
 
       if (users.length === chunkSize) {
@@ -64,6 +66,19 @@ export class UserService extends PageService {
   async findOneByUsername(username: string): Promise<User | null> {
     const user = await this.userRepository.findOneBy({ username });
     return user;
+  }
+
+  async getGender(id: number) {
+    const user = await this.userRepository.findOne({
+      where: { id },
+      select: ['gender'],
+    });
+
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+
+    return user.gender;
   }
 
   async findProfileById(id: number) {

@@ -19,6 +19,7 @@ import { FilterDto } from 'src/common/filter.dto';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @Public()
   @Post('fillUsers')
   async fillUsers() {
     await this.userService.fillUsers();
@@ -39,6 +40,12 @@ export class UserController {
   @Get(':username')
   findOneByUsername(@Param('username') username: string) {
     return this.userService.findOneByUsername(username);
+  }
+
+  @Public()
+  @Get(':id/gender')
+  async getGender(@Param('id') userId: number) {
+    return await this.userService.getGender(userId);
   }
 
   @Public()

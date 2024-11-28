@@ -8,7 +8,7 @@ export const dataSourceOptions: DataSourceOptions = {
   port: 5432,
   username: 'postgres',
   password: '',
-  database: 'masar-blog-db',
+  database: 'masar-blog',
   synchronize: false,
   logging: true,
   migrations: ['src/migration/*{.ts,.js}'],

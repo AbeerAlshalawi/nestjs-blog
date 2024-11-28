@@ -22,7 +22,7 @@ const entitiesPath = __dirname + '/**/*.entity{.ts,.js}';
       port: 5432,
       username: 'postgres',
       password: '',
-      database: 'masar-blog-db',
+      database: 'masar-blog',
       entities: [entitiesPath],
       synchronize: false,
     }),
