@@ -25,6 +25,12 @@ export class User {
   })
   gender: Gender;
 
+  @Column({ default: 0 })
+  followersCount: number;
+
+  @Column({ default: 0 })
+  followingsCount: number;
+
   @OneToMany(() => Article, (article) => article.user)
   articles: Article[];
 

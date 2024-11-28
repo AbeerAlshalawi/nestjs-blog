@@ -115,7 +115,7 @@ export class UserService extends PageService {
 
   async fillFollows() {
     const users = await this.userRepository.find();
-    const totalFollows = 500_000;
+    const totalFollows = 50_000;
     const follows: { follower: User; following: User }[] = [];
 
     for (let i = 0; i < totalFollows; i++) {
@@ -138,6 +138,7 @@ export class UserService extends PageService {
         if (follows.length % 10_000 === 0) {
           console.log('Inserting follow batch:', follows.length);
           await this.followRepository.insert(follows);
+
           follows.length = 0;
         }
       }
@@ -226,6 +227,11 @@ export class UserService extends PageService {
     });
 
     await this.followRepository.save(follow);
+
+    follower.followingsCount += 1;
+    following.followersCount += 1;
+
+    await this.userRepository.save([follower, following]);
   }
 
   async unfollow(followerId: number, followingId: number) {
@@ -237,6 +243,14 @@ export class UserService extends PageService {
       throw new HttpException('User is not followed', HttpStatus.NOT_FOUND);
     }
 
+    const follower = await this.userRepository.findOneBy({ id: followerId });
+    const following = await this.userRepository.findOneBy({ id: followingId });
+
     await this.followRepository.remove(follow);
+
+    follower.followingsCount -= 1;
+    following.followersCount -= 1;
+
+    await this.userRepository.save([follower, following]);
   }
 }

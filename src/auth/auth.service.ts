@@ -47,6 +47,8 @@ export class AuthService {
       password: hashedPassword,
       articles: [],
       comments: [],
+      followersCount: 0,
+      followingsCount: 0,
       followers: [],
       followings: [],
     };
