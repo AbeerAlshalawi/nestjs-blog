@@ -82,20 +82,35 @@ export class UserService extends PageService {
   }
 
   async findProfileById(id: number) {
-    const user = await this.userRepository.findOneBy({ id });
+    const user = await this.userRepository.findOne({
+      where: { id },
+      select: ['id', 'username', 'gender'],
+    });
 
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
-    const followers = await this.getFollowers(id);
-    const followings = await this.getFollowings(id);
+    const followersCount = await this.getFollowersCount(id);
+    const followingsCount = await this.getFollowingsCount(id);
 
     return {
       user,
-      followers: followers,
-      followings: followings,
+      followersCount,
+      followingsCount,
     };
+  }
+
+  async getFollowersCount(userId: number) {
+    return await this.followRepository.count({
+      where: { following: { id: userId } },
+    });
+  }
+
+  async getFollowingsCount(userId: number) {
+    return await this.followRepository.count({
+      where: { follower: { id: userId } },
+    });
   }
 
   async fillFollows() {
@@ -133,7 +148,7 @@ export class UserService extends PageService {
     }
   }
 
-  async getFollowers(userId: number, filter?: FilterDto) {
+  async getFollowers(userId: number, filter: FilterDto) {
     const where = { following: { id: userId } };
 
     const [followers, total] = await this.paginate(
@@ -159,7 +174,7 @@ export class UserService extends PageService {
     };
   }
 
-  async getFollowings(userId: number, filter?: FilterDto) {
+  async getFollowings(userId: number, filter: FilterDto) {
     const where = { follower: { id: userId } };
 
     const [followings, total] = await this.paginate(
