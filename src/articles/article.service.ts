@@ -78,13 +78,11 @@ export class ArticleService extends PageService {
   }
 
   async getAll(filter: FilterDto) {
-    const where = {};
+    const where = { title: filter.filter };
 
-    if (filter.title) {
-      where['title'] = Like(`%${filter.title}%`);
-    }
+    //  where['title'] = Like(`%${filter.title}%`);
 
-    const [articles, count] = await this.paginate(
+    const [articles, total] = await this.paginate(
       this.articleRepository,
       filter,
       where,
@@ -92,7 +90,7 @@ export class ArticleService extends PageService {
 
     return {
       data: articles,
-      count: count,
+      count: total,
       currentPage: filter.page,
       pageSize: filter.pageSize,
     };

@@ -32,7 +32,7 @@ export class AuthController {
   ): Promise<RegisterResponseDTO | BadRequestException> {
     if (!registerBody.username || !registerBody.password) {
       throw new HttpException(
-        'Username and password are requiured',
+        'Username and password are required',
         HttpStatus.BAD_REQUEST,
       );
     }

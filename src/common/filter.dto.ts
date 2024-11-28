@@ -1,30 +1,28 @@
+import { Transform } from 'class-transformer';
 import { SortOrder } from './sort-order-enum';
 import { IsOptional, IsInt, Min, IsEnum, IsString } from 'class-validator';
 
 export class FilterDto {
+  @Transform(({ value }) => parseInt(value))
   @IsOptional()
   @IsInt()
   @Min(1)
-  page: number = 1;
+  page?: number = 1;
 
+  @Transform(({ value }) => parseInt(value))
   @IsOptional()
   @IsInt()
   @Min(1)
-  pageSize: number = 10;
+  pageSize?: number = 10;
 
   @IsOptional()
   @IsString()
-  public orderBy?: string;
+  orderBy?: string;
 
   @IsOptional()
   @IsEnum(SortOrder)
-  public sortOrder?: SortOrder = SortOrder.DESC;
+  sortOrder: SortOrder = SortOrder.DESC;
 
   @IsOptional()
-  @IsString()
-  title?: string;
-
-  @IsOptional()
-  @IsString()
-  content?: string;
+  filter?: any;
 }

@@ -5,14 +5,18 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Follow } from './entities/follow.entity';
 import { faker } from '@faker-js/faker';
+import { FilterDto } from 'src/common/filter.dto';
+import { PageService } from 'src/common/page.service';
 
 @Injectable()
-export class UserService {
+export class UserService extends PageService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(Follow)
     private followRepository: Repository<Follow>,
-  ) {}
+  ) {
+    super();
+  }
 
   async create(createUserDto: CreateUserDTO) {
     const { username, password } = createUserDto;
@@ -74,35 +78,96 @@ export class UserService {
 
     return {
       user,
-      followers: followers.map((follow) => follow.follower),
-      followings: followings.map((follow) => follow.following),
+      followers: followers,
+      followings: followings,
     };
   }
 
-  getFollowers(userId: number) {
-    return this.followRepository.find({
-      where: { following: { id: userId } },
-      relations: ['follower'],
-      select: {
+  async fillFollows() {
+    const users = await this.userRepository.find();
+    const totalFollows = 500_000;
+    const follows: { follower: User; following: User }[] = [];
+
+    for (let i = 0; i < totalFollows; i++) {
+      const randomFollower = users[Math.floor(Math.random() * users.length)];
+      const randomFollowing = users[Math.floor(Math.random() * users.length)];
+
+      if (
+        randomFollower.id !== randomFollowing.id &&
+        !follows.some(
+          (f) =>
+            f.follower.id === randomFollower.id &&
+            f.following.id === randomFollowing.id,
+        )
+      ) {
+        follows.push({
+          follower: randomFollower,
+          following: randomFollowing,
+        });
+
+        if (follows.length % 10_000 === 0) {
+          console.log('Inserting follow batch:', follows.length);
+          await this.followRepository.insert(follows);
+          follows.length = 0;
+        }
+      }
+    }
+
+    if (follows.length > 0) {
+      await this.followRepository.insert(follows);
+    }
+  }
+
+  async getFollowers(userId: number, filter?: FilterDto) {
+    const where = { following: { id: userId } };
+
+    const [followers, total] = await this.paginate(
+      this.followRepository,
+      filter,
+      where,
+      {
         follower: {
           id: true,
           username: true,
         },
       },
-    });
+      {
+        follower: true,
+      },
+    );
+
+    return {
+      data: followers,
+      count: total,
+      currentPage: filter.page,
+      pageSize: filter.pageSize,
+    };
   }
 
-  getFollowings(userId: number) {
-    return this.followRepository.find({
-      where: { follower: { id: userId } },
-      relations: ['following'],
-      select: {
+  async getFollowings(userId: number, filter?: FilterDto) {
+    const where = { follower: { id: userId } };
+
+    const [followings, total] = await this.paginate(
+      this.followRepository,
+      filter,
+      where,
+      {
         following: {
           id: true,
           username: true,
         },
       },
-    });
+      {
+        following: true,
+      },
+    );
+
+    return {
+      data: followings,
+      count: total,
+      currentPage: filter.page,
+      pageSize: filter.pageSize,
+    };
   }
 
   async follow(followerId: number, followingId: number) {

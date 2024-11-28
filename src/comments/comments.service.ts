@@ -27,11 +27,9 @@ export class CommentService extends PageService {
   async findAllByArticle(articleId: number, filter: FilterDto) {
     const where: any = { article: { id: articleId } };
 
-    if (filter.content) {
-      where['content'] = Like(`%${filter.content}%`);
-    }
+    where['content'] = Like(`%${filter.filter}%`);
 
-    const [comments, count] = await this.paginate(
+    const [comments, total] = await this.paginate(
       this.commentRepository,
       filter,
       where,
@@ -39,7 +37,7 @@ export class CommentService extends PageService {
 
     return {
       data: comments,
-      count: count,
+      count: total,
       currentPage: filter.page,
       pageSize: filter.pageSize,
     };

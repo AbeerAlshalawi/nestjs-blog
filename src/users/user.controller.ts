@@ -7,11 +7,13 @@ import {
   Delete,
   Request,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { Public } from 'src/auth/decorators/public.decorator';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
+import { FilterDto } from 'src/common/filter.dto';
 
 @Controller({ path: 'user', version: '1.0' })
 export class UserController {
@@ -33,23 +35,30 @@ export class UserController {
     return await this.userService.findProfileById(req.user.id);
   }
 
+  @Public()
   @Get(':username')
   findOneByUsername(@Param('username') username: string) {
     return this.userService.findOneByUsername(username);
   }
 
   @Public()
+  @Post('fillFollows')
+  async fillFollows() {
+    await this.userService.fillFollows();
+  }
+
+  @Public()
   @Get(':id/followers')
-  async getFollowers(@Param('id') userId: number) {
-    const followers = await this.userService.getFollowers(userId);
-    return followers.map((follow) => follow.follower);
+  async getFollowers(@Param('id') userId: number, @Query() filter: FilterDto) {
+    const followers = await this.userService.getFollowers(userId, filter);
+    return followers;
   }
 
   @Public()
   @Get(':id/followings')
-  async getFollowings(@Param('id') userId: number) {
-    const followings = await this.userService.getFollowings(userId);
-    return followings.map((follow) => follow.following);
+  async getFollowings(@Param('id') userId: number, @Query() filter: FilterDto) {
+    const followings = await this.userService.getFollowings(userId, filter);
+    return followings;
   }
 
   @UseGuards(JwtGuard)
