@@ -21,7 +21,7 @@ export class FilterDto {
 
   @IsOptional()
   @IsEnum(SortOrder)
-  sortOrder: SortOrder = SortOrder.DESC;
+  sortOrder?: SortOrder = SortOrder.DESC;
 
   @IsOptional()
   filter?: any;

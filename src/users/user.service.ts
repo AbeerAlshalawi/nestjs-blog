@@ -7,6 +7,7 @@ import { Follow } from './entities/follow.entity';
 import { faker } from '@faker-js/faker';
 import { FilterDto } from 'src/common/filter.dto';
 import { PageService } from 'src/common/page.service';
+import { UserDTO } from './dto/user.dto';
 
 @Injectable()
 export class UserService extends PageService {
@@ -30,6 +31,7 @@ export class UserService extends PageService {
 
     const user = this.userRepository.create(createUserDto);
     await this.userRepository.save(user);
+    return { ...createUserDto };
   }
 
   async fillUsers() {
@@ -63,9 +65,17 @@ export class UserService extends PageService {
     }
   }
 
-  async findOneByUsername(username: string): Promise<User | null> {
-    const user = await this.userRepository.findOneBy({ username });
-    return user;
+  async findOneByUsername(username: string): Promise<UserDTO | null> {
+    const user = await this.userRepository.findOne({
+      where: { username },
+      select: ['id', 'username', 'password'],
+    });
+
+    return {
+      id: user.id,
+      username: user.username,
+      password: user.password,
+    };
   }
 
   async getGender(id: number) {
@@ -95,9 +105,9 @@ export class UserService extends PageService {
     const followingsCount = await this.getFollowingsCount(id);
 
     return {
-      user,
-      followersCount,
-      followingsCount,
+      username: user.username,
+      followersCount: followersCount,
+      followingsCount: followingsCount,
     };
   }
 
@@ -152,7 +162,7 @@ export class UserService extends PageService {
   async getFollowers(userId: number, filter: FilterDto) {
     const where = { following: { id: userId } };
 
-    const [followers, total] = await this.paginate(
+    const [follows, total] = await this.paginate(
       this.followRepository,
       filter,
       where,
@@ -167,6 +177,11 @@ export class UserService extends PageService {
       },
     );
 
+    const followers = follows.map((follow) => ({
+      id: follow.follower.id,
+      username: follow.follower.username,
+    }));
+
     return {
       data: followers,
       count: total,
@@ -178,7 +193,7 @@ export class UserService extends PageService {
   async getFollowings(userId: number, filter: FilterDto) {
     const where = { follower: { id: userId } };
 
-    const [followings, total] = await this.paginate(
+    const [follows, total] = await this.paginate(
       this.followRepository,
       filter,
       where,
@@ -192,6 +207,11 @@ export class UserService extends PageService {
         following: true,
       },
     );
+
+    const followings = follows.map((follow) => ({
+      id: follow.following.id,
+      username: follow.following.username,
+    }));
 
     return {
       data: followings,
@@ -232,6 +252,7 @@ export class UserService extends PageService {
     following.followersCount += 1;
 
     await this.userRepository.save([follower, following]);
+    return HttpStatus.OK;
   }
 
   async unfollow(followerId: number, followingId: number) {
@@ -252,5 +273,6 @@ export class UserService extends PageService {
     following.followersCount -= 1;
 
     await this.userRepository.save([follower, following]);
+    return HttpStatus.OK;
   }
 }

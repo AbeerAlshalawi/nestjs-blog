@@ -70,7 +70,7 @@ export class UserController {
 
   @UseGuards(JwtGuard)
   @Post(':id/follow')
-  async followUser(@Param('id') userId: number, @Request() req) {
+  async follow(@Param('id') userId: number, @Request() req) {
     return this.userService.follow(req.user.id, userId);
   }
 
