@@ -11,13 +11,12 @@ import { JwtStrategy } from './auth/strategy/jwt.startegy';
 import { ConfigModule } from '@nestjs/config';
 import { CommentsModule } from './comments/comments.module';
 import { RedisModule } from './redis/redis.module';
+import * as dotenv from 'dotenv';
 
 const entitiesPath = __dirname + '/**/*.entity{.ts,.js}';
 
-//let typeOrmConfig = {};
-
+dotenv.config();
 const env = process.env.NODE_ENV;
-
 console.log('✅ env', env);
 
 @Module({

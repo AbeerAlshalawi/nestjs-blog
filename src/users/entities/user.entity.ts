@@ -1,6 +1,12 @@
 import { Article } from 'src/articles/entities/article.entity';
 import { Comment } from 'src/comments/entities/comment.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  Index,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Follow } from './follow.entity';
 
 export enum Gender {
@@ -13,12 +19,14 @@ export class User {
   @PrimaryGeneratedColumn()
   id?: number;
 
+  @Index('idx_users_on_username')
   @Column()
   username: string;
 
   @Column()
   password: string;
 
+  @Index('idx_users_on_gender')
   @Column({
     type: 'enum',
     enum: Gender,

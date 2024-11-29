@@ -7,6 +7,7 @@ import {
   ManyToOne,
   OneToMany,
   CreateDateColumn,
+  Index,
 } from 'typeorm';
 
 @Entity('articles')
@@ -14,6 +15,7 @@ export class Article {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Index('idx_articles_on_title')
   @Column()
   title: string;
 
