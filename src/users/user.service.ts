@@ -1,18 +1,22 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDTO } from './dto/create-user.dto';
-import { User } from './entities/user.entity';
+import { Gender, User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Follow } from './entities/follow.entity';
 import { faker } from '@faker-js/faker';
+import { FilterDto } from 'src/common/filter.dto';
+import { PageService } from 'src/common/page.service';
 
 @Injectable()
-export class UserService {
+export class UserService extends PageService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(Follow)
     private followRepository: Repository<Follow>,
-  ) {}
+  ) {
+    super();
+  }
 
   async create(createUserDto: CreateUserDTO) {
     const { username, password } = createUserDto;
@@ -36,12 +40,14 @@ export class UserService {
     const users = [];
 
     for (let i = 0; i < totalUsers; i++) {
-      const randomUsername = faker.internet.username;
+      const randomUsername = faker.internet.username();
       const randomPassword = faker.internet.password();
+      const randomGender = faker.helpers.arrayElement(Object.values(Gender));
 
       users.push({
         username: randomUsername,
         password: randomPassword,
+        gender: randomGender,
       });
 
       if (users.length === chunkSize) {
@@ -62,47 +68,137 @@ export class UserService {
     return user;
   }
 
-  async findProfileById(id: number) {
-    const user = await this.userRepository.findOneBy({ id });
+  async getGender(id: number) {
+    const user = await this.userRepository.findOne({
+      where: { id },
+      select: ['gender'],
+    });
 
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
-    const followers = await this.getFollowers(id);
-    const followings = await this.getFollowings(id);
+    return user.gender;
+  }
+
+  async findProfileById(id: number) {
+    const user = await this.userRepository.findOne({
+      where: { id },
+      select: ['id', 'username', 'gender'],
+    });
+
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+
+    const followersCount = await this.getFollowersCount(id);
+    const followingsCount = await this.getFollowingsCount(id);
 
     return {
       user,
-      followers: followers.map((follow) => follow.follower),
-      followings: followings.map((follow) => follow.following),
+      followersCount,
+      followingsCount,
     };
   }
 
-  getFollowers(userId: number) {
-    return this.followRepository.find({
+  async getFollowersCount(userId: number) {
+    return await this.followRepository.count({
       where: { following: { id: userId } },
-      relations: ['follower'],
-      select: {
+    });
+  }
+
+  async getFollowingsCount(userId: number) {
+    return await this.followRepository.count({
+      where: { follower: { id: userId } },
+    });
+  }
+
+  async fillFollows() {
+    const users = await this.userRepository.find();
+    const totalFollows = 50_000;
+    const follows: { follower: User; following: User }[] = [];
+
+    for (let i = 0; i < totalFollows; i++) {
+      const randomFollower = users[Math.floor(Math.random() * users.length)];
+      const randomFollowing = users[Math.floor(Math.random() * users.length)];
+
+      if (
+        randomFollower.id !== randomFollowing.id &&
+        !follows.some(
+          (f) =>
+            f.follower.id === randomFollower.id &&
+            f.following.id === randomFollowing.id,
+        )
+      ) {
+        follows.push({
+          follower: randomFollower,
+          following: randomFollowing,
+        });
+
+        if (follows.length % 10_000 === 0) {
+          console.log('Inserting follow batch:', follows.length);
+          await this.followRepository.insert(follows);
+
+          follows.length = 0;
+        }
+      }
+    }
+
+    if (follows.length > 0) {
+      await this.followRepository.insert(follows);
+    }
+  }
+
+  async getFollowers(userId: number, filter: FilterDto) {
+    const where = { following: { id: userId } };
+
+    const [followers, total] = await this.paginate(
+      this.followRepository,
+      filter,
+      where,
+      {
         follower: {
           id: true,
           username: true,
         },
       },
-    });
+      {
+        follower: true,
+      },
+    );
+
+    return {
+      data: followers,
+      count: total,
+      currentPage: filter.page,
+      pageSize: filter.pageSize,
+    };
   }
 
-  getFollowings(userId: number) {
-    return this.followRepository.find({
-      where: { follower: { id: userId } },
-      relations: ['following'],
-      select: {
+  async getFollowings(userId: number, filter: FilterDto) {
+    const where = { follower: { id: userId } };
+
+    const [followings, total] = await this.paginate(
+      this.followRepository,
+      filter,
+      where,
+      {
         following: {
           id: true,
           username: true,
         },
       },
-    });
+      {
+        following: true,
+      },
+    );
+
+    return {
+      data: followings,
+      count: total,
+      currentPage: filter.page,
+      pageSize: filter.pageSize,
+    };
   }
 
   async follow(followerId: number, followingId: number) {
@@ -131,6 +227,11 @@ export class UserService {
     });
 
     await this.followRepository.save(follow);
+
+    follower.followingsCount += 1;
+    following.followersCount += 1;
+
+    await this.userRepository.save([follower, following]);
   }
 
   async unfollow(followerId: number, followingId: number) {
@@ -142,6 +243,14 @@ export class UserService {
       throw new HttpException('User is not followed', HttpStatus.NOT_FOUND);
     }
 
+    const follower = await this.userRepository.findOneBy({ id: followerId });
+    const following = await this.userRepository.findOneBy({ id: followingId });
+
     await this.followRepository.remove(follow);
+
+    follower.followingsCount -= 1;
+    following.followersCount -= 1;
+
+    await this.userRepository.save([follower, following]);
   }
 }

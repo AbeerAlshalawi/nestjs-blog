@@ -1,19 +1,21 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateArticleDTO } from './dto/create-article.dto';
 import { Article } from './entities/article.entity';
-import { Like, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UpdateArticleDTO } from './dto/update-article.dto';
 import { User } from 'src/users/entities/user.entity';
 import { faker } from '@faker-js/faker';
 import { PageService } from 'src/common/page.service';
 import { FilterDto } from 'src/common/filter.dto';
+import { RedisService } from 'src/redis/redis.service';
 
 @Injectable()
 export class ArticleService extends PageService {
   constructor(
     @InjectRepository(Article) private articleRepository: Repository<Article>,
     @InjectRepository(User) private userRepository: Repository<User>,
+    private readonly redisService: RedisService,
   ) {
     super();
   }
@@ -78,24 +80,31 @@ export class ArticleService extends PageService {
   }
 
   async getAll(filter: FilterDto) {
-    const where = {};
-
-    if (filter.title) {
-      where['title'] = Like(`%${filter.title}%`);
+    const cacheKey = JSON.stringify(filter);
+    const cachedData = await this.redisService.get(cacheKey);
+    if (cachedData) {
+      return JSON.parse(cachedData);
     }
 
-    const [articles, count] = await this.paginate(
+    const where = { title: filter.filter };
+
+    const [articles, total] = await this.paginate(
       this.articleRepository,
       filter,
       where,
     );
+    console.log('------ Articles retrived from the DB');
 
-    return {
+    const result = {
       data: articles,
-      count: count,
+      count: total,
       currentPage: filter.page,
       pageSize: filter.pageSize,
     };
+
+    await this.redisService.set(cacheKey, JSON.stringify(result), 60 * 5);
+
+    return result;
   }
 
   async fillArticles() {

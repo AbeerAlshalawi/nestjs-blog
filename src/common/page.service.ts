@@ -1,4 +1,9 @@
-import { Repository, FindOptionsWhere } from 'typeorm';
+import {
+  Repository,
+  FindOptionsWhere,
+  FindOptionsSelect,
+  FindOptionsRelations,
+} from 'typeorm';
 import { FilterDto } from './filter.dto';
 import { SortOrder } from './sort-order-enum';
 
@@ -19,12 +24,16 @@ export class PageService {
     repository: Repository<T>,
     filter: FilterDto,
     where: FindOptionsWhere<T>,
+    select?: FindOptionsSelect<T>,
+    relations?: FindOptionsRelations<T>,
   ) {
     return repository.findAndCount({
       order: this.createOrderQuery(filter),
       skip: (filter.page - 1) * filter.pageSize,
       take: filter.pageSize,
       where: where,
+      select: select,
+      relations: relations,
     });
   }
 }

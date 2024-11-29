@@ -10,6 +10,7 @@ import { JwtGuard } from './auth/guards/jwt.guard';
 import { JwtStrategy } from './auth/strategy/jwt.startegy';
 import { ConfigModule } from '@nestjs/config';
 import { CommentsModule } from './comments/comments.module';
+import { RedisModule } from './redis/redis.module';
 
 const entitiesPath = __dirname + '/**/*.entity{.ts,.js}';
 
@@ -22,7 +23,7 @@ const entitiesPath = __dirname + '/**/*.entity{.ts,.js}';
       port: 5432,
       username: 'postgres',
       password: '',
-      database: 'masar-blog-db',
+      database: 'masar-blog',
       entities: [entitiesPath],
       synchronize: false,
     }),
@@ -30,6 +31,7 @@ const entitiesPath = __dirname + '/**/*.entity{.ts,.js}';
     UserModule,
     AuthModule,
     CommentsModule,
+    RedisModule,
   ],
   controllers: [AppController],
   providers: [
