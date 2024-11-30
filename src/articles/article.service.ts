@@ -4,11 +4,11 @@ import { Article } from './entities/article.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UpdateArticleDTO } from './dto/update-article.dto';
-import { User } from 'src/users/entities/user.entity';
+import { User } from '../users/entities/user.entity';
 import { faker } from '@faker-js/faker';
-import { PageService } from 'src/common/page.service';
-import { FilterDto } from 'src/common/filter.dto';
-import { RedisService } from 'src/redis/redis.service';
+import { PageService } from '../common/page.service';
+import { FilterDto } from '../common/filter.dto';
+import { RedisService } from '../redis/redis.service';
 
 @Injectable()
 export class ArticleService extends PageService {
@@ -30,11 +30,13 @@ export class ArticleService extends PageService {
       );
     }
 
+    const user = await this.userRepository.findOne({ where: { id: userId } });
     const article = new Article();
     article.title = title;
     article.body = body;
-    article.user = { id: userId } as User;
+    article.user = user;
     await this.articleRepository.save(article);
+    return article;
   }
 
   async update(id: number, updateArticleDto: UpdateArticleDTO, userId: number) {
@@ -72,7 +74,7 @@ export class ArticleService extends PageService {
     if (article.user.id !== userId) {
       throw new HttpException(
         'You are not authorized to delete this article',
-        HttpStatus.FORBIDDEN,
+        HttpStatus.UNAUTHORIZED,
       );
     }
 

@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Like, Repository } from 'typeorm';
 import { CreateCommentDTO } from './dto/create-comment.dto';
-import { Comment } from 'src/comments/entities/comment.entity';
-import { Article } from 'src/articles/entities/article.entity';
-import { FilterDto } from 'src/common/filter.dto';
-import { PageService } from 'src/common/page.service';
+import { Comment } from '../comments/entities/comment.entity';
+import { Article } from '../articles/entities/article.entity';
+import { FilterDto } from '../common/filter.dto';
+import { PageService } from '../common/page.service';
 
 @Injectable()
 export class CommentService extends PageService {

@@ -1,8 +1,12 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { User } from 'src/users/entities/user.entity';
-import { UserService } from 'src/users/user.service';
+import { User } from '../users/entities/user.entity';
+import { UserService } from '../users/user.service';
 import { RegisterRequestDTO } from './dto/register-request.dto';
 import { AccessToken } from './types/AccessToken';
 
@@ -13,24 +17,24 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async validateUser(username: string, password: string): Promise<User> {
-    const user: User = await this.userService.findOneByUsername(username);
+  async validateUser(username: string, password: string) {
+    const user = await this.userService.findOneByUsername(username);
     if (!user) {
-      throw new BadRequestException('User not found');
+      throw new UnauthorizedException('User not found');
     }
     const isMatch: boolean = bcrypt.compareSync(password, user.password);
     if (!isMatch) {
-      throw new BadRequestException('Password does not match');
+      throw new UnauthorizedException('Password does not match');
     }
     return user;
   }
 
-  async login(user: User): Promise<AccessToken> {
+  async login(user: User) {
     const payload = {
       username: user.username,
       id: user.id,
     };
-    return { access_token: this.jwtService.sign(payload) };
+    return { id: user.id, access_token: this.jwtService.sign(payload) };
   }
 
   async register(user: RegisterRequestDTO): Promise<AccessToken> {

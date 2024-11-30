@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  HttpCode,
   HttpException,
   HttpStatus,
   Post,
@@ -21,6 +22,7 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @UseGuards(AuthGuard('local'))
+  @HttpCode(200)
   @Post('login')
   async login(@Request() req): Promise<LoginResponseDTO | BadRequestException> {
     return this.authService.login(req.user);
