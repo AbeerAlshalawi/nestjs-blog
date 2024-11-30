@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
-export class UserDTO {
+export class FollowerDto {
   @IsNumber()
   @IsNotEmpty()
   id: number;
@@ -8,8 +8,14 @@ export class UserDTO {
   @IsString()
   @IsNotEmpty()
   username: string;
+}
+
+export class FollowingDto {
+  @IsNumber()
+  @IsNotEmpty()
+  id: number;
 
   @IsString()
   @IsNotEmpty()
-  password: string;
+  username: string;
 }

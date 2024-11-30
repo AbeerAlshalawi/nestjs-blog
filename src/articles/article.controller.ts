@@ -12,10 +12,10 @@ import {
 } from '@nestjs/common';
 import { ArticleService } from './article.service';
 import { CreateArticleDTO } from './dto/create-article.dto';
-import { Public } from 'src/auth/decorators/public.decorator';
-import { JwtGuard } from 'src/auth/guards/jwt.guard';
+import { Public } from '../auth/decorators/public.decorator';
+import { JwtGuard } from '../auth/guards/jwt.guard';
 import { UpdateArticleDTO } from './dto/update-article.dto';
-import { FilterDto } from 'src/common/filter.dto';
+import { FilterDto } from '../common/filter.dto';
 
 @Controller({ path: 'articles', version: '1.0' })
 export class ArticleController {

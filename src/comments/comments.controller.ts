@@ -9,9 +9,9 @@ import {
 } from '@nestjs/common';
 import { CommentService } from './comments.service';
 import { CreateCommentDTO } from './dto/create-comment.dto';
-import { JwtGuard } from 'src/auth/guards/jwt.guard';
-import { FilterDto } from 'src/common/filter.dto';
-import { Public } from 'src/auth/decorators/public.decorator';
+import { JwtGuard } from '../auth/guards/jwt.guard';
+import { FilterDto } from '../common/filter.dto';
+import { Public } from '../auth/decorators/public.decorator';
 
 @Controller({ path: 'articles/:articleId/comments', version: '1.0' })
 export class CommentsController {

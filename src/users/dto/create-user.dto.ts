@@ -9,6 +9,4 @@ export class CreateUserDTO {
   @IsString()
   @IsNotEmpty()
   readonly password: string;
-
-  articles: Article[];
 }

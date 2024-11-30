@@ -11,9 +11,9 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDTO } from './dto/create-user.dto';
-import { Public } from 'src/auth/decorators/public.decorator';
-import { JwtGuard } from 'src/auth/guards/jwt.guard';
-import { FilterDto } from 'src/common/filter.dto';
+import { Public } from '../auth/decorators/public.decorator';
+import { JwtGuard } from '../auth/guards/jwt.guard';
+import { FilterDto } from '../common/filter.dto';
 
 @Controller({ path: 'user', version: '1.0' })
 export class UserController {
@@ -70,7 +70,7 @@ export class UserController {
 
   @UseGuards(JwtGuard)
   @Post(':id/follow')
-  async followUser(@Param('id') userId: number, @Request() req) {
+  async follow(@Param('id') userId: number, @Request() req) {
     return this.userService.follow(req.user.id, userId);
   }
 
