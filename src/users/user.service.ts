@@ -5,8 +5,8 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Follow } from './entities/follow.entity';
 import { faker } from '@faker-js/faker';
-import { FilterDto } from 'src/common/filter.dto';
-import { PageService } from 'src/common/page.service';
+import { FilterDto } from '../common/filter.dto';
+import { PageService } from '../common/page.service';
 import { UserDTO } from './dto/user.dto';
 
 @Injectable()
@@ -70,6 +70,10 @@ export class UserService extends PageService {
       where: { username },
       select: ['id', 'username', 'password'],
     });
+
+    if (!user) {
+      return null;
+    }
 
     return {
       id: user.id,
