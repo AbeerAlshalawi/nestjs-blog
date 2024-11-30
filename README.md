@@ -16,7 +16,7 @@ After applying indexing there was a big improvement in execution time. This is a
 <img src="screenshots/Without Indexing.png"/>
 
 #### After indexing:
-<img src="/With Indexing.png"/>
+<img src="screenshots/With Indexing.png"/>
 
 ## System Design
 ### Current system:
