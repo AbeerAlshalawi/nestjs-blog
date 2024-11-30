@@ -33,7 +33,7 @@ console.log('✅ env', env);
             database: process.env.TEST_DB_NAME,
             autoLoadEntities: true,
             entities: [entitiesPath],
-            synchronize: false,
+            synchronize: true,
             migrationsRun: true,
             logging: false,
           }
