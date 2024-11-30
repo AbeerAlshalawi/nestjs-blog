@@ -13,10 +13,10 @@ CREATE INDEX idx_articles_on_title ON "articles"(title)
 
 After applying indexing there was a big improvement in execution time. This is an example for querying by username from the users table:
 #### Before indexing:
-<img src="screenshots/without Indexing.png"/>
+<img src="screenshots/Without Indexing.png"/>
 
 #### After indexing:
-<img src="/with Indexing.png"/>
+<img src="/With Indexing.png"/>
 
 ## System Design
 ### Current system:
