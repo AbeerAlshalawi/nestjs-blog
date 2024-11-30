@@ -26,6 +26,9 @@ After applying indexing there was a big improvement in execution time. This is a
 Adding load balancers to distrubute traffic will make the system more scalable
 <img src="screenshots/future system design.png"/>
 
+## Deployment
+Product: https://nestjs-blog-76sz.onrender.com
+Staging: https://nestjs-blog-staging.onrender.com
 
 ## Testing
 ### Unit testing user controller:
